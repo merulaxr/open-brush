@@ -71,5 +71,10 @@ static class AndroidUtils {
     var context = GetContext();
     return context.Call<string>("getPackageName");
   }
+
+  public static int GetAndroidSDKVersion()
+  {
+      return new AndroidJavaClass("android.os.Build$VERSION").GetStatic<int>("SDK_INT");
+  }
 }
 #endif
