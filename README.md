@@ -4,6 +4,7 @@
 [![All GitHub releases](https://img.shields.io/github/downloads/icosa-gallery/open-brush/total?label=GitHub%20downloads)](https://github.com/icosa-gallery/open-brush/releases/latest)
 [![Twitter](https://img.shields.io/badge/follow-%40IcosaGallery-blue.svg?style=flat&logo=twitter)](https://twitter.com/IcosaGallery)
 [![Discord](https://discordapp.com/api/guilds/783806589991780412/embed.png?style=shield)](https://discord.gg/W7NCEYnEfy)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmikeskydev%2Fopen-brush.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmikeskydev%2Fopen-brush?ref=badge_shield)
 
 
 **Current Version: ![Current Version](https://img.shields.io/github/v/release/icosa-gallery/open-brush)**
@@ -396,3 +397,7 @@ executable.
 
 Experimental brushes and environments are located in the `Assets/Resources/X`
 folder. They are not included in non-experimental builds.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmikeskydev%2Fopen-brush.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmikeskydev%2Fopen-brush?ref=badge_large)
