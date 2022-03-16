@@ -17591,6 +17591,8 @@ MonoBehaviour:
     type: 3}
   m_UnityXRCosmosControlsPrefab: {fileID: 1268974758188984, guid: 85fc13e5ae2f36048a146dc67041a295,
     type: 3}
+  m_UnityXRHandsControlsPrefab: {fileID: 1268974758188984, guid: 4bcd7b44d3e12c5419a69df8172ba423,
+    type: 3}
   m_OculusRiftControlsPrefab: {fileID: 1000010438099326, guid: 131d871a617b1fe4eabf58454bc37ff2,
     type: 3}
   m_OculusQuestControlsPrefab: {fileID: 1000010438099326, guid: b4dcfd92747c6ef448f06a0c8d30a3bc,

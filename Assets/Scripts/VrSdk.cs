@@ -39,6 +39,7 @@ namespace TiltBrush
         Gvr,
         LogitechPen,
         Cosmos,
+        Hands
     }
 
     //
@@ -72,6 +73,7 @@ namespace TiltBrush
         [SerializeField] private GameObject m_UnityXRWmrControlsPrefab;
         [SerializeField] private GameObject m_UnityXRKnucklesControlsPrefab;
         [SerializeField] private GameObject m_UnityXRCosmosControlsPrefab;
+        [SerializeField] private GameObject m_UnityXRHandsControlsPrefab;
         // Prefab for the old-style Touch controllers, used only for Rift
         [SerializeField] private GameObject m_OculusRiftControlsPrefab;
         // Prefab for the new-style Touch controllers, used for Rift-S and Quest
@@ -659,6 +661,9 @@ namespace TiltBrush
                 case ControllerStyle.Cosmos:
                     controlsPrefab = m_UnityXRCosmosControlsPrefab;
                     break;
+                case ControllerStyle.Hands:
+                    controlsPrefab = m_UnityXRHandsControlsPrefab;
+                    break;
                 case ControllerStyle.OculusTouch:
                     {
                         // TODO:Mike - comment below is correct, this won't work!
@@ -1125,6 +1130,10 @@ namespace TiltBrush
             else if (device.name.StartsWith("HTC Vive Controller OpenXR"))
             {
                 SetControllerStyle(ControllerStyle.Vive);
+            }
+            else if (device.name.StartsWith("HoloLens Hand OpenXR"))
+            {
+                SetControllerStyle(ControllerStyle.Knuckles);
             }
             else
             {
