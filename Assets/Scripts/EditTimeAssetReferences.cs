@@ -59,6 +59,7 @@ namespace TiltBrush
                 case BuildTarget.StandaloneWindows64:
                 case BuildTarget.StandaloneLinux64:
                 case BuildTarget.StandaloneOSX:
+                case BuildTarget.WSAPlayer:
                     return m_PlatformConfigPc;
                 default:
                     throw new ArgumentException("target");

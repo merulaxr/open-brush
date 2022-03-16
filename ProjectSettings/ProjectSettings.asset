@@ -748,7 +748,7 @@ PlayerSettings:
   scriptingDefineSymbols:
     1: USD_SUPPORTED;UNITY_HAS_GOOGLEVR;TILT_BRUSH;FBX_SUPPORTED;FBXSDK_RUNTIME;LATK_SUPPORTED
     7: TILT_BRUSH;OCULUS_SUPPORTED
-    14: USD_SUPPORTED;UNITY_HAS_GOOGLEVR;TILT_BRUSH
+    14: UNITY_HAS_GOOGLEVR;TILT_BRUSH
   additionalCompilerArguments: {}
   platformArchitecture:
     iPhone: 1
@@ -813,13 +813,13 @@ PlayerSettings:
       Objects3D: False
       BlockedChatMessages: False
       PhoneCall: False
-      SpatialPerception: False
+      SpatialPerception: True
       Microphone: False
       SharedUserCertificates: False
       InputInjectionBrokered: False
       PicturesLibrary: False
       RemovableStorage: False
-      WebCam: False
+      WebCam: True
       VoipCall: False
       UserAccountInformation: False
       Proximity: False

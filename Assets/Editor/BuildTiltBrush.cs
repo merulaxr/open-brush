@@ -98,6 +98,7 @@ static class BuildTiltBrush
     const string kMenuPlatformLinux = "Open Brush/Build/Platform: Linux";
     const string kMenuPlatformOsx = "Open Brush/Build/Platform: OSX";
     const string kMenuPlatformAndroid = "Open Brush/Build/Platform: Android";
+    const string kMenuPlatformWsa = "Open Brush/Build/Platform: WSA";
     const string kMenuExperimental = "Open Brush/Build/Experimental";
     const string kMenuDevelopment = "Open Brush/Build/Development";
     const string kMenuMono = "Open Brush/Build/Runtime: Mono";
@@ -113,6 +114,7 @@ static class BuildTiltBrush
             // OpenXR
             new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.OpenXR, BuildTarget.StandaloneWindows64),
             new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.OpenXR, BuildTarget.Android),
+            new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.OpenXR, BuildTarget.WSAPlayer),
 
             // Oculus
             new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.Oculus, BuildTarget.StandaloneWindows64),
@@ -216,9 +218,9 @@ static class BuildTiltBrush
         {
             EditorPrefs.SetString(kMenuPlatformPref, value.ToString());
             Menu.SetChecked(kMenuPlatformWindows, value == BuildTarget.StandaloneWindows64);
-            Menu.SetChecked(kMenuPlatformLinux, value == BuildTarget.StandaloneLinux64);
             Menu.SetChecked(kMenuPlatformOsx, value == BuildTarget.StandaloneOSX);
             Menu.SetChecked(kMenuPlatformAndroid, value == BuildTarget.Android);
+            Menu.SetChecked(kMenuPlatformWsa, value == BuildTarget.WSAPlayer);
         }
     }
 
@@ -329,17 +331,17 @@ static class BuildTiltBrush
         BuildTarget buildTarget = GuiSelectedBuildTarget;
 
         string sdk = GuiSelectedSdk.ToString();
-        if (GuiSelectedBuildTarget == BuildTarget.Android)
-            sdk += "Mobile";
+        string platform = buildTarget.ToString();
 
         var directoryName = string.Format(
-            "{0}_{1}_{5}{2}{3}{4}",
+            "{0}_{1}_{2}_{3}{4}{5}{6}",
             sdk,
+            platform,
+            kGuiBuildExecutableName,
             GuiDevelopment ? "Debug" : "Release",
             GuiExperimental ? "_Experimental" : "",
             GuiRuntimeIl2cpp ? "_Il2cpp" : "",
-            GuiAutoProfile ? "_AutoProfile" : "",
-            kGuiBuildExecutableName);
+            GuiAutoProfile ? "_AutoProfile" : "");
         var location = Path.GetDirectoryName(Path.GetDirectoryName(Application.dataPath));
 
         location = Path.Combine(Path.Combine(location, "Builds"), directoryName);
@@ -357,6 +359,8 @@ static class BuildTiltBrush
                 break;
             case BuildTarget.StandaloneOSX:
                 location += "/" + kGuiBuildOsxExecutableName;
+                break;
+            case BuildTarget.WSAPlayer:
                 break;
             default:
                 throw new BuildFailedException("Unsupported BuildTarget: " + buildTarget.ToString());
@@ -510,6 +514,19 @@ static class BuildTiltBrush
         return BuildTargetSupported(GuiSelectedSdk, BuildTarget.Android);
     }
 
+    [MenuItem(kMenuPlatformWsa, isValidateFunction: false, priority: 210)]
+    static void MenuItem_Platform_Wsa()
+    {
+        GuiSelectedBuildTarget = BuildTarget.WSAPlayer;
+    }
+
+    [MenuItem(kMenuPlatformWsa, isValidateFunction: true)]
+    static bool MenuItem_Platform_Wsa_Validate()
+    {
+        Menu.SetChecked(kMenuPlatformWsa, GuiSelectedBuildTarget == BuildTarget.WSAPlayer);
+        return BuildTargetSupported(GuiSelectedSdk, BuildTarget.WSAPlayer);
+    }
+
     //=======  Runtimes =======
 
     [MenuItem(kMenuMono, isValidateFunction: false, priority: 300)]
@@ -625,6 +642,8 @@ static class BuildTiltBrush
                 return BuildTargetGroup.Android;
             case BuildTarget.iOS:
                 return BuildTargetGroup.iOS;
+            case BuildTarget.WSAPlayer:
+                return BuildTargetGroup.WSA;
             default:
                 throw new ArgumentException("buildTarget");
         }
