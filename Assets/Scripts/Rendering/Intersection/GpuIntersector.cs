@@ -68,6 +68,7 @@ namespace TiltBrush
 
         [SerializeField] private Shader m_IntersectionShader;
         [SerializeField] private Shader m_DownsampleShader;
+        [SerializeField] private Renderer debugPlaneRenderer;
         [SerializeField] private ComputeShader m_ComputeCopyShader;
 
         private Material m_DownsampleMat;
@@ -192,6 +193,7 @@ namespace TiltBrush
         {
             m_IntersectionCamera = GetComponent<Camera>();
 
+
             // WARNING: All textures must be LINEAR and sample filter modes should be POINT, to avoid
             //          interpolating or remapping the output batch and triangle IDs.
             m_DownsampleMat = new Material(m_DownsampleShader);
@@ -240,12 +242,15 @@ namespace TiltBrush
 
             // Assign the texture to capture the output.
             m_IntersectionCamera.targetTexture = m_HighResTex;
-
+            debugPlaneRenderer.material.SetTexture("_MainTex", m_HighResTex);
             // Frame the camera to the detection sphere.
             m_IntersectionCamera.transform.position = vDetectionCenter_GS;
             m_IntersectionCamera.nearClipPlane = -radius_GS;
             m_IntersectionCamera.farClipPlane = radius_GS;
             m_IntersectionCamera.orthographicSize = radius_GS;
+            float scale = 2 * radius_GS;
+            m_IntersectionCamera.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+
 
             // This is a heuristic to generally orient the camera in the same way as the user's head, such
             // that if any object is visible to the user, it will also be visible for intersection. A better
