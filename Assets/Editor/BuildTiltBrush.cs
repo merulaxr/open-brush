@@ -93,6 +93,7 @@ static class BuildTiltBrush
     const string kMenuPluginOculus = "Open Brush/Build/Plugin: Oculus";
     const string kMenuPluginWave = "Open Brush/Build/Plugin: Wave";
     const string kMenuPluginPico = "Open Brush/Build/Plugin: Pico";
+    const string kMenuPluginQiyu = "Open Brush/Build/Plugin: Qiyu";
     const string kMenuPlatformPref = "Open Brush/Build/Platform";
     const string kMenuPlatformWindows = "Open Brush/Build/Platform: Windows";
     const string kMenuPlatformLinux = "Open Brush/Build/Platform: Linux";
@@ -125,6 +126,10 @@ static class BuildTiltBrush
             // Pico
             new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.Pico, BuildTarget.Android),
 #endif // PICO_SUPPORTED
+#if QIYU_SUPPORTED
+            // Qiyu
+            new KeyValuePair<XrSdkMode, BuildTarget>(XrSdkMode.Qiyu, BuildTarget.Android),
+#endif
         };
 
     static readonly List<CopyRequest> kToCopy = new List<CopyRequest>
@@ -464,6 +469,28 @@ static class BuildTiltBrush
         return false;
 #endif
     }
+
+    [MenuItem(kMenuPluginQiyu, isValidateFunction: true)]
+    static bool MenuItem_Plugin_Qiyu_Validate()
+    {
+#if QIYU_SUPPORTED
+        Menu.SetChecked(kMenuPluginQiyu, GuiSelectedSdk == XrSdkMode.Qiyu);
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    [MenuItem(kMenuPluginQiyu, isValidateFunction: false, priority: 135)]
+    static void MenuItem_Plugin_Qiyu()
+    {
+        GuiSelectedSdk = XrSdkMode.Qiyu;
+    }
+
+    [MenuItem(kMenuPluginQiyu, isValidateFunction: true)]
+    static bool MenuItem_Plugin_Qiyu_Validate()
+    {
+        Menu.SetChecked(kMenuPluginPico, GuiSelectedSdk == XrSdkMode.Qiyu);
 
     //=======  Platforms =======
 
@@ -1095,6 +1122,9 @@ static class BuildTiltBrush
 
             switch (tiltOptions.XrSdk)
             {
+                case XrSdkMode.Qiyu:
+                    targetXrPluginsRequired = new string[] { "Unity.XR.Qiyu.QiyuLoader" };
+                    break;
                 case XrSdkMode.Oculus:
                     targetXrPluginsRequired = new string[] { "Unity.XR.Oculus.OculusLoader" };
                     break;

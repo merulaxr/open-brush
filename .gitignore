@@ -102,5 +102,8 @@
 # Pico Integration
 Packages/com.unity.xr.picoxr
 
+# Qiyu
+Packages/com.unity.xr.qiyu
+
 # Cache files
 *.cache

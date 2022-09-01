@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77451858e5dde4856b24e0033625530e, type: 3}
+  m_Name: Qiyu Settings
+  m_EditorClassIdentifier: 
+  m_StereoRenderingModeAndroid: 0
+  UseDefaultRenderTexture: 1
+  cpuPerfLevel: 2
+  gpuPerfLevel: 2
+  optionFlags: 0
+  TrackPosition: 1
+  VSyncCount: 1
+  InterPupilDistance: 0.064
+  foveationLevel: 0
+  foveationGain: {x: 0, y: 0}
+  foveationArea: 0
+  foveationMinmum: 0
+  IsMultiThreadedRendering: 0
+  blitType: 0
