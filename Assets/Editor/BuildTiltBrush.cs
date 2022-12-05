@@ -470,6 +470,12 @@ static class BuildTiltBrush
 #endif
     }
 
+    [MenuItem(kMenuPluginQiyu, isValidateFunction: false, priority: 135)]
+    static void MenuItem_Plugin_Qiyu()
+    {
+        GuiSelectedSdk = XrSdkMode.Qiyu;
+    }
+
     [MenuItem(kMenuPluginQiyu, isValidateFunction: true)]
     static bool MenuItem_Plugin_Qiyu_Validate()
     {
@@ -480,17 +486,6 @@ static class BuildTiltBrush
         return false;
 #endif
     }
-
-    [MenuItem(kMenuPluginQiyu, isValidateFunction: false, priority: 135)]
-    static void MenuItem_Plugin_Qiyu()
-    {
-        GuiSelectedSdk = XrSdkMode.Qiyu;
-    }
-
-    [MenuItem(kMenuPluginQiyu, isValidateFunction: true)]
-    static bool MenuItem_Plugin_Qiyu_Validate()
-    {
-        Menu.SetChecked(kMenuPluginPico, GuiSelectedSdk == XrSdkMode.Qiyu);
 
     //=======  Platforms =======
 
