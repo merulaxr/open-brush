@@ -1199,6 +1199,7 @@ static class BuildTiltBrush
             {
                 case XrSdkMode.Pico:
                 case XrSdkMode.Wave:
+                case XrSdkMode.Qiyu:
                     targetGraphicsApisRequired = new UnityEngine.Rendering.GraphicsDeviceType[] { UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3 };
                     break;
                 default:
