@@ -34,41 +34,43 @@ Shader "Brush/Special/Intersection" {
 #pragma fragment frag
 #pragma geometry geom
 
+#include "UnityCG.cginc" 
 #include "Assets/Shaders/Include/Brush.cginc"
 #include "Assets/Shaders/Include/PackInt.cginc"
-
-// TODO: This is currently disabled because of issues with back facing triangles.
-#define TILT_ENABLE_CONSERVATIVE_RASTER 0
 
       uniform float3 vSphereCenter;
       uniform float fSphereRad;
 
       struct appdata_t {
         float4 vertex : POSITION;
+        UNITY_VERTEX_INPUT_INSTANCE_ID
       };
 
-      struct v2f {
+      struct v2g {
         float4 vertex : POSITION;
         float4 worldPos : TEXCOORD0;
         half4 color : COLOR;
-
-#if TILT_ENABLE_CONSERVATIVE_RASTER // Saves some overhead when unused.
-        float4 aabb : TEXCOORD1;
-        float4 clipPos : TEXCOORD2;
-#endif
+        UNITY_VERTEX_INPUT_INSTANCE_ID
+        UNITY_VERTEX_OUTPUT_STEREO
       };
 
-      v2f vert(appdata_t v)
+      struct g2f {
+        float4 vertex : POSITION;
+        float4 worldPos : TEXCOORD0;
+        half4 color : COLOR;
+        UNITY_VERTEX_OUTPUT_STEREO
+      };
+
+      v2g vert(appdata_t v)
       {
-        v2f o;
+        v2g o;
+
+        UNITY_SETUP_INSTANCE_ID(v); //Insert
+        UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); //Insert 
+        
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.worldPos = mul(unity_ObjectToWorld, v.vertex);
         o.color = half4(0, 0, 0, 0);
-
-#if TILT_ENABLE_CONSERVATIVE_RASTER
-        o.aabb = float4(0, 0, 0, 0);
-        o.clipPos = o.vertex;
-#endif
 
         return o;
       }
@@ -158,99 +160,38 @@ Shader "Brush/Special/Intersection" {
       }
 
       [maxvertexcount(3)]
-      void geom(triangle v2f input[3],
-            inout TriangleStream<v2f> OutputStream,
+      void geom(triangle g2f input[3],
+            inout TriangleStream<g2f> OutputStream,
             uint id : SV_PrimitiveID)
       {
-        v2f test = (v2f)0;
+        g2f o;
 
-#if 1
         // This method also handles the case of large triangles.
-        // TODO: the 'any' and 'all' functions appear to not work on Android. Have disabled check for now.
-        bool hit = SphereInTriangle(input[0].worldPos, input[1].worldPos, input[2].worldPos, vSphereCenter, fSphereRad);
-          //&& any(input[0].worldPos != input[1].worldPos)
-          //&& any(input[0].worldPos != input[2].worldPos)
-          //&& any(input[2].worldPos != input[1].worldPos);
-          
-
-#else
-        // TODO: Remove in M14.
-        // Explicitly not testing for extremely large triangles where the sphere is internal
-        bool hit = any(input[0].worldPos != input[1].worldPos)
-            && any(input[0].worldPos != input[2].worldPos)
-            && any(input[2].worldPos != input[1].worldPos)
-            && (SegmentSphereIntersection(input[0].worldPos, input[1].worldPos, vSphereCenter, fSphereRad)
-             || SegmentSphereIntersection(input[1].worldPos, input[2].worldPos, vSphereCenter, fSphereRad)
-             || SegmentSphereIntersection(input[2].worldPos, input[0].worldPos, vSphereCenter, fSphereRad));
-#endif
-
-        // Discard the triangle if there is no hit.
-        if (!hit) {
-          return;
-        }
-
-#if TILT_ENABLE_CONSERVATIVE_RASTER
-        // Note that ScreenParams.zw are defined as 1 + 1/screen.{width,height}
-        float2 halfPixel = (1 / _ScreenParams.xy) * .5;
-        float3 plane[2];
-
-        test.aabb = float4(input[0].vertex.xy,
-                   input[0].vertex.xy);
-
-        for (int j = 1; j < 3; j++)
-        {
-          test.aabb.xy = min(test.aabb.xy, input[j].vertex.xy);
-          test.aabb.zw = max(test.aabb.zw, input[j].vertex.xy);
-        }
-#endif
+        // bool hit = any(o1.worldPos != o2.worldPos)
+        //   && any(o1.worldPos != o3.worldPos)
+        //   && any(o3.worldPos != o2.worldPos)
+        //   && SphereInTriangle(o1.worldPos, o2.worldPos, o3.worldPos, vSphereCenter, fSphereRad);
+        
+        // // Discard the triangle if there is no hit.
+        // if (!hit) {
+        //   return;
+        // }
 
         for (int i = 0; i < 3; i++)
         {
-          float4 currPos = input[i].vertex;
+          o.worldPos = input[i].worldPos;
+          o.vertex = input[i].vertex;
+          o.color = PackUint16x2ToRgba8(uint2(_BatchID, id));
 
-#if TILT_ENABLE_CONSERVATIVE_RASTER
-          // Conservative rasterization.
-          // http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter42.html
-
-          float4 prevPos = input[(i + 2.0) % 3.0].vertex;
-          float4 nextPos = input[(i + 1.0) % 3.0].vertex;
-
-          // Compute planes for intersection
-          plane[0] = cross(currPos.xyw - prevPos.xyw, prevPos.xyw);
-          plane[1] = cross(nextPos.xyw - currPos.xyw, currPos.xyw);
-
-          // Move the planes by the appropriate semidiagonal
-          plane[0].z -= dot(halfPixel.xy, abs(plane[0].xy));
-          plane[1].z -= dot(halfPixel.xy, abs(plane[1].xy));
-
-          // Compute the intersection point of the planes.
-          currPos.xyw = cross(plane[0], plane[1]);
-          currPos.z = 0;
-
-          test.clipPos = currPos / currPos.w;
-#endif
-          test.vertex = currPos;
-          test.worldPos = input[i].worldPos;
-          test.color = PackUint16x2ToRgba8(uint2(_BatchID, id));
-
+          UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(input[i], o);
+          
           // Note, world space pos has not been inflated.
-          OutputStream.Append(test);
+          OutputStream.Append(o);
         }
       }
 
-      half4 frag(v2f i) : COLOR
+      half4 frag(g2f i) : COLOR
       {
-#if TILT_ENABLE_CONSERVATIVE_RASTER
-        float2 pos = i.clipPos.xy;
-
-        // Discard fragment if outside the AABB. In.AABB contains min values
-        // in the xy components and max values in the zw components
-
-        if (pos.x < i.aabb.x || pos.x > i.aabb.z ||
-          pos.y < i.aabb.y || pos.y > i.aabb.w) {
-          discard;
-        }
-#endif
         return i.color;
       }
 
@@ -259,5 +200,4 @@ Shader "Brush/Special/Intersection" {
   }
 
   Fallback "Unlit/Diffuse"
-
 }
