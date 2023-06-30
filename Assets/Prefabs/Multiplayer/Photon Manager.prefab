@@ -45,6 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fcc2a76c51ecf42acbae1e2e781c01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  roomName: testRoom
+  connectOnStart: 0
+  runner: {fileID: 0}
+  userPrefab: {fileID: 5719192839092223532, guid: 7654e29010e014d4981f52622222ba85,
+    type: 3}
 --- !u!114 &2619355559738742176
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,21 +15,72 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 namespace TiltBrush.Multiplayer
 {
-    public class NetworkRig : MonoBehaviour
+    [OrderAfter(typeof(NetworkTransform))]
+    public class NetworkRig : NetworkBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        public NetworkTransform playArea;
+        public NetworkTransform head;
+        public NetworkTransform leftHand;
+        public NetworkTransform rightHand;
 
+        private LocalRig localRig;
+        public override void Spawned()
+        {
+            base.Spawned();
+            if (Object.HasStateAuthority)
+            {
+                localRig = FindObjectOfType<LocalRig>();
+                if (localRig == null)
+                {
+                    Debug.LogError("Could not find local player rig!");
+                }
+            }
         }
 
-        // Update is called once per frame
-        void Update()
+        public override void FixedUpdateNetwork()
         {
+            base.FixedUpdateNetwork();
 
+            // update the rig at each network tick
+            if (GetInput<RigData>(out var input))
+            {
+                ApplyInputToRigParts(input);
+            }
+        }
+
+        protected virtual void ApplyInputToRigParts(RigData input)
+        {
+            playArea.transform.position = input.playAreaPosition;
+            playArea.transform.rotation = input.playAreaRotation;
+            leftHand.transform.position = input.leftHandPosition;
+            leftHand.transform.rotation = input.leftHandRotation;
+            rightHand.transform.position = input.rightHandPosition;
+            rightHand.transform.rotation = input.rightHandRotation;
+            head.transform.position = input.headPosition;
+            head.transform.rotation = input.headRotation;
+        }
+
+        public override void Render()
+        {
+            base.Render();
+            if (Object.HasStateAuthority)
+            {
+                // Extrapolate for local user :
+                // we want to have the visual at the good position as soon as possible, so we force the visuals to follow the most fresh hardware positions
+                // To update the visual object, and not the actual networked position, we move the interpolation targets
+                playArea.InterpolationTarget.position = localRig.playArea.position;
+                playArea.InterpolationTarget.rotation = localRig.playArea.rotation;
+                leftHand.InterpolationTarget.position = localRig.leftHand.position;
+                leftHand.InterpolationTarget.rotation = localRig.leftHand.rotation;
+                rightHand.InterpolationTarget.position = localRig.rightHand.position;
+                rightHand.InterpolationTarget.rotation = localRig.rightHand.rotation;
+                head.InterpolationTarget.position = localRig.headTransform.position;
+                head.InterpolationTarget.rotation = localRig.headTransform.rotation;
+            }
         }
     }
 }
